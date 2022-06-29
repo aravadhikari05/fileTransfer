@@ -1,31 +1,47 @@
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.Socket;
 
 public class fileSender {
 
     private Socket socket;
-    private String ip = "192.168.1.30";
-    private InputStream in;
+    private BufferedInputStream input;
+    private BufferedOutputStream output;
 
 
-    public fileSender(int PORT, File file) {
+    public fileSender(int PORT, File fileToSend, String ip) {
         try {
             socket = new Socket(ip, PORT);
             System.out.println("connected");
 
-            in = new FileInputStream(file);
+            input = new BufferedInputStream(new FileInputStream(fileToSend));
+            output = new BufferedOutputStream(socket.getOutputStream());
 
-            byte[] data = new byte[in.available()];
-            for(int i = 0; i < data.length; i++) {
-                System.out.write(data[i]);
+            byte[] buffer = new byte[8192];
+            int count;
+            while((count = input.read(buffer)) != -1) {
+                output.write(buffer, 0, count);
             }
-            
+
+
 
         } catch (IOException e) {
             throw new RuntimeException(e);
+        } finally {
+            try {
+                if (input != null) input.close();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            try {
+                if (input != null) output.close();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            try {
+                if (socket != null) socket.close();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 }
