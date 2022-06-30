@@ -2,62 +2,54 @@ import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-public class fileReceiver {
+public class FileReceiver implements Runnable{
 
-    private ServerSocket server;
-    private Socket client;
+    private ServerSocket serverSocket;
+    private Socket socket;
+
+    private int port;
 
     private BufferedInputStream input;
     private BufferedOutputStream output;
 
-    public fileReceiver(int PORT, File fileToWrite){
-        try {
-            server = new ServerSocket(PORT);
-            client = server.accept();
+    private String fileToWritePath;
 
-            System.out.println("connected");
-
-            input = new BufferedInputStream(client.getInputStream());
-            output = new BufferedOutputStream(new FileOutputStream(fileToWrite));
-
-            byte[] buffer = new byte[8192];
-            int count;
-
-            while((count = input.read(buffer)) != -1) {
-                output.write(buffer, 0, count);
-            }
-
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } finally {
-            try {
-                if(input != null) input.close();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-            try {
-                if(output != null) output.close();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-            if(client != null) {
-                try {
-                    client.close();
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-            if(server != null) {
-                try {
-                    server.close();
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-
-        }
-
+    public FileReceiver(String fileToWritePath, int port){
+        this.fileToWritePath = fileToWritePath;
+        this.port = port;
     }
 
+    @Override
+    public void run() {
+        try {
+            serverSocket = new ServerSocket(port);
+        } catch (IOException e) {
+            System.out.println(e);
+        }
+        while (true) {
+            try {
+                System.out.println("Waiting for client");
+                socket = serverSocket.accept();
+                System.out.println("Connected to client");
 
+                input = new BufferedInputStream(socket.getInputStream());
+                output = new BufferedOutputStream(new FileOutputStream(fileToWritePath));
+
+                System.out.println("Saving file");
+                if (StreamTools.copyStream(input, output)) {
+                    System.out.println("File Saved");
+                } else {
+                    System.out.println("File couldn't be saved");
+                }
+
+
+            } catch (IOException e) {
+                System.out.println(e);
+            } finally {
+                StreamTools.closeInputStream(input);
+                StreamTools.closeOutputStream(output);
+                StreamTools.closeSocket(socket);
+            }
+        }
+    }
 }

@@ -1,47 +1,48 @@
 import java.io.*;
+import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.util.ArrayList;
 
-public class fileSender {
+public class FileSender {
 
     private Socket socket;
     private BufferedInputStream input;
     private BufferedOutputStream output;
 
+    private int port;
 
-    public fileSender(int PORT, File fileToSend, String ip) {
+    private ArrayList<String> connections;
+
+    public FileSender(int port) {
+        connections = new ArrayList<>();
+        this.port = port;
+    }
+    public void sendFile(String fileToSendPath, String ip) {
         try {
-            socket = new Socket(ip, PORT);
-            System.out.println("connected");
+            System.out.println("Waiting for server");
+            socket = new Socket();
+            socket.connect( new InetSocketAddress(ip, port), 2000);
+            System.out.println("Connected to server");
 
-            input = new BufferedInputStream(new FileInputStream(fileToSend));
+            input = new BufferedInputStream(new FileInputStream(fileToSendPath));
             output = new BufferedOutputStream(socket.getOutputStream());
 
-            byte[] buffer = new byte[8192];
-            int count;
-            while((count = input.read(buffer)) != -1) {
-                output.write(buffer, 0, count);
+            System.out.println("Sending file");
+            if (StreamTools.copyStream(input, output)) {
+                System.out.println("File sent");
+            } else{
+                System.out.println("File could not be sent");
             }
-
-
-
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        } catch(IOException e) {
+            System.out.println(e);
         } finally {
-            try {
-                if (input != null) input.close();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-            try {
-                if (input != null) output.close();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-            try {
-                if (socket != null) socket.close();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+            StreamTools.closeInputStream(input);
+            StreamTools.closeOutputStream(output);
+            StreamTools.closeSocket(socket);
         }
+    }
+
+    public ArrayList<String> getConnections() {
+        return connections;
     }
 }
