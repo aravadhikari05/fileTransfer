@@ -7,58 +7,123 @@ import java.util.ArrayList;
 
 public class GUI extends JPanel {
 
-    public final int WINDOW_WIDTH = 600;
-    public final int WINDOW_HEIGHT = 200;
+    public final int WINDOW_WIDTH = 360;
+    public final int WINDOW_HEIGHT = 180;
 
-    File selectedFile;
-    ArrayList<String> temp;
+    private String selectedFilePath;
+
+    private JTextField fileText;
+    private JComboBox<String> dropdown;
+    private JButton browse;
+    private JButton send;
+
+    private ArrayList<Observer> observers;
+
 
     public GUI() {
         initPanel();
-        fileOpener();
-        setArrow();
-        selectClient();
-        sendButton();
     }
 
     private void initPanel() {
-        setPreferredSize(new Dimension(WINDOW_WIDTH, WINDOW_HEIGHT));
+        observers = new ArrayList<>();
+
+        setLayout(null);
         setBackground(new Color (0xEFE0B8));
-    }
-    private void setArrow() {
-        ImageIcon image = new ImageIcon("src/arrow.png");
-        JLabel arrow = new JLabel(image);
-        add(arrow);
-    }
 
-    private void fileOpener() {
-        JFileChooser f1 = new JFileChooser();
-        JTextField text = new JTextField("Choose File");
-        text.setEditable(false);
-        text.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                int returnValue = f1.showDialog(GUI.this, "OPEN");
-                if (returnValue == JFileChooser.APPROVE_OPTION) {
-                    selectedFile = f1.getSelectedFile();
-                    text.setText(selectedFile.getName());
-                }
-            }
-        });
-        add(text);
-    }
+        JLabel hostLabel = new JLabel("Host:");
+        hostLabel.setBounds(50, 0, 80, 25);
+        add(hostLabel);
 
-    private void selectClient() {
-        temp = new ArrayList<>();
-        temp.add("hi");
-        temp.add("ooo");
-        temp.add("kflsadjf");
-        JComboBox clientList = new JComboBox(temp.toArray());
-        add(clientList);
-    }
-    private void sendButton() {
-        JButton send = new JButton("send");
+        dropdown= ipDropdown();
+        dropdown.setBounds(20, 20, 300, 25);
+        add(dropdown);
+
+        JLabel fileLabel = new JLabel("File Name:");
+        fileLabel.setBounds(40, 60, 80, 25);
+        add(fileLabel);
+
+        fileText = new JTextField();
+        fileText.setEditable(false);
+        fileText.setBounds(20, 80, 230, 25);
+        add(fileText);
+
+        browse = browseButton();
+        browse.setBounds(260, 80, 80, 25);
+        add(browse);
+
+        send = sendButton();
+        send.setBounds(120, 130, 100, 25);
         add(send);
+
+        setPreferredSize(new Dimension(WINDOW_WIDTH, WINDOW_HEIGHT));
+
+    }
+
+    private JButton browseButton() {
+        JButton butt = new JButton("Browse");
+        JFileChooser fc = new JFileChooser();
+        butt.addActionListener(ae -> {
+            fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+            fc.showOpenDialog(null);
+            if(fc.getSelectedFile() != null) {
+                selectedFilePath = fc.getSelectedFile().getAbsolutePath();
+                fileText.setText(selectedFilePath);
+                fireSelectedFileWasChange();
+            }
+        } );
+        return butt;
+    }
+
+    private JButton sendButton() {
+        JButton butt = new JButton("Send");
+        butt.addActionListener(ae -> {
+            fireSendButtonPressed();
+        });
+        return butt;
+    }
+
+    private JComboBox<String> ipDropdown() {
+        JComboBox<String> drop= new JComboBox<>();
+        drop.addActionListener(ae -> {
+            fireSelectedIPWasChanged();
+        });
+
+        return drop;
+    }
+
+    public String getSelectedFilePath() {
+        return selectedFilePath;
+    }
+    public String getSelectedIP() {
+        return String.valueOf(dropdown.getSelectedItem());
+    }
+    public void updateDropdown(ArrayList<String> list) {
+        dropdown.removeAllItems();
+        for(String s: list) {
+            dropdown.addItem(s);
+        }
+    }
+    public void fireSelectedIPWasChanged() {
+        for(Observer o: observers) {
+            o.selectedIPWasChanged(this);
+        }
+    }
+    public void fireSelectedFileWasChange() {
+        for(Observer o: observers) {
+            o.selectedFileWasChanged(this);
+        }
+    }
+    public void fireSendButtonPressed() {
+        for(Observer o: observers) {
+            o.sendButtonWasPressed(this);
+        }
+    }
+
+    public void addObserver(Observer o) {
+        observers.add(o);
+    }
+    public void removeObserver(Observer o) {
+        observers.remove(o);
     }
 
 }
