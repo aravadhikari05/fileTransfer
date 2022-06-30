@@ -25,15 +25,12 @@ public class Controller implements Observer, Runnable{
 
     public void startThreads() {
         Thread t1 = new Thread(server);
-        Thread t2 = new Thread(this);
-
         t1.start();
-        t2.start();
     }
 
     @Override
     public void selectedIPWasChanged(GUI panel) {
-        if(panel.getSelectedIP() == null) ip = panel.getSelectedIP();
+        if(panel.getSelectedIP() != null) ip = panel.getSelectedIP();
     }
 
     @Override
@@ -43,8 +40,7 @@ public class Controller implements Observer, Runnable{
 
     @Override
     public void sendButtonWasPressed(GUI gui) {
-        System.out.println(filePath + ip);
-        if(filePath != "" || ip != "") client.sendFile(filePath, ip);
+        if(!filePath.equals("") && !ip.equals("")) client.sendFile(filePath, ip);
     }
 
     @Override
