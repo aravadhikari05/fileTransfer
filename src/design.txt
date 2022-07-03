@@ -1,0 +1,43 @@
+=====DESIGN=====
+*3 main components:
+    *gui (handles input and visuals)
+    *logic (handles pinging computers, sending, and receiving files)
+    *controller (observes gui and logic and ties them together)
+
+*gui:
+    *Sending
+        *displays:
+            *host list
+            *file to send (with uneditable text box and browse)
+            *send button
+        *recieves:
+            *host list from controller whenever it is updated
+        *sends:
+            *host list selection to controller WHEN SEND CLICKED
+            *file to send to controller WHEN SEND CLICKED
+            *signal controller that send has been clicked
+            /The only time controller needs info is when the send button is clicked
+    *Receiving
+        *displays:
+            *popup with title "[Host] wants to send you:"
+            *filename
+            *accept and deny button
+        *recieves:
+            *host up from controller
+            *file to save from controller
+        *sends:
+            *signal controller that accept or deny has been clicked
+*logic
+    *Main components
+        *Server handles
+            *replying that it is online
+            *receiving/relaying data that computer is online
+            *recieving/relaying data that file is trying to be sent
+            *replying with file accept or deny signal
+            *saving if file accepted
+        *Client handles
+            *pinging computers that it is online (socket terminates afterward)
+            *sends signal that it is trying to send data
+            *listens for reply, sends data accordingly
+            *sends signal if it is closing
+

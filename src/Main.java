@@ -1,8 +1,4 @@
 import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.File;
-import java.util.Arrays;
 
 public class Main {
     public static void main(String[] args) {
@@ -10,17 +6,20 @@ public class Main {
         //temp-----
         String file = "src/newfile.txt";
         //---------
-        GUI gui = new GUI();
+        guiPanel gui = new guiPanel();
         createFrame(gui);
         FileSender client = new FileSender(port);
         FileReceiver server = new FileReceiver(file, port);
         Controller controller = new Controller(gui, client, server, port);
 
-        controller.startThreads();
+        Thread t1 = new Thread(server);
+        t1.start();
+
+        controller.pingComputers();
 
     }
 
-    public static void createFrame(GUI panel) {
+    public static void createFrame(guiPanel panel) {
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e) {

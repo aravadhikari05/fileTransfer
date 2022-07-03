@@ -9,8 +9,8 @@ public class FileReceiver implements Runnable{
 
     private int port;
 
-    private BufferedInputStream input;
-    private BufferedOutputStream output;
+    private DataInputStream input;
+    private DataOutputStream output;
 
     private String fileToWritePath;
 
@@ -32,8 +32,19 @@ public class FileReceiver implements Runnable{
                 socket = serverSocket.accept();
                 System.out.println("Connected to client");
 
-                input = new BufferedInputStream(socket.getInputStream());
-                output = new BufferedOutputStream(new FileOutputStream(fileToWritePath));
+                input = new DataInputStream(socket.getInputStream());
+                output = new DataOutputStream(new FileOutputStream(fileToWritePath));
+/*
+                boolean done = false;
+
+                while(!done) {
+                    byte indicator = input.readByte();
+
+                    switch(indicator) {
+                        case 1:
+
+                    }
+                }*/
 
                 System.out.println("Saving file");
                 if (StreamTools.copyStream(input, output)) {

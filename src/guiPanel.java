@@ -11,10 +11,8 @@ public class guiPanel extends JPanel {
 
     private JTextField fileText;
     private JComboBox<String> dropdown;
-    private JButton browse;
-    private JButton send;
 
-    private ArrayList<Observer> observers;
+    private ArrayList<guiObserver> observers;
 
 
     public guiPanel() {
@@ -31,7 +29,7 @@ public class guiPanel extends JPanel {
         hostLabel.setBounds(50, 0, 80, 25);
         add(hostLabel);
 
-        dropdown= ipDropdown();
+        JComboBox<String> dropdown= new JComboBox<>();
         dropdown.setBounds(20, 20, 300, 25);
         add(dropdown);
 
@@ -44,11 +42,11 @@ public class guiPanel extends JPanel {
         fileText.setBounds(20, 80, 230, 25);
         add(fileText);
 
-        browse = browseButton();
+        JButton browse = browseButton();
         browse.setBounds(260, 80, 80, 25);
         add(browse);
 
-        send = sendButton();
+        JButton send = sendButton();
         send.setBounds(120, 130, 100, 25);
         add(send);
 
@@ -65,7 +63,6 @@ public class guiPanel extends JPanel {
             if(fc.getSelectedFile() != null) {
                 selectedFilePath = fc.getSelectedFile().getAbsolutePath();
                 fileText.setText(selectedFilePath);
-                fireSelectedFileWasChange();
             }
         } );
         return butt;
@@ -77,15 +74,6 @@ public class guiPanel extends JPanel {
             fireSendButtonPressed();
         });
         return butt;
-    }
-
-    private JComboBox<String> ipDropdown() {
-        JComboBox<String> drop= new JComboBox<>();
-        drop.addActionListener(ae -> {
-            fireSelectedIPWasChanged();
-        });
-
-        return drop;
     }
 
     public String getSelectedFilePath() {
@@ -100,26 +88,17 @@ public class guiPanel extends JPanel {
             dropdown.addItem(s);
         }
     }
-    public void fireSelectedIPWasChanged() {
-        for(Observer o: observers) {
-            o.selectedIPWasChanged(this);
-        }
-    }
-    public void fireSelectedFileWasChange() {
-        for(Observer o: observers) {
-            o.selectedFileWasChanged(this);
-        }
-    }
+
     public void fireSendButtonPressed() {
-        for(Observer o: observers) {
+        for(guiObserver o: observers) {
             o.sendButtonWasPressed(this);
         }
     }
 
-    public void addObserver(Observer o) {
+    public void addObserver(guiObserver o) {
         observers.add(o);
     }
-    public void removeObserver(Observer o) {
+    public void removeObserver(guiObserver o) {
         observers.remove(o);
     }
 
