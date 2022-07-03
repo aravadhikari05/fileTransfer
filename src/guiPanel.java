@@ -1,11 +1,8 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.io.File;
 import java.util.ArrayList;
 
-public class GUI extends JPanel {
+public class guiPanel extends JPanel {
 
     public final int WINDOW_WIDTH = 360;
     public final int WINDOW_HEIGHT = 180;
@@ -20,7 +17,7 @@ public class GUI extends JPanel {
     private ArrayList<Observer> observers;
 
 
-    public GUI() {
+    public guiPanel() {
         initPanel();
     }
 
