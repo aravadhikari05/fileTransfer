@@ -1,0 +1,60 @@
+=====DESIGN=====
+*3 main components:
+    *gui (handles input and visuals)
+    *logic (handles pinging computers, sending, and receiving files)
+    *controller (observes gui and logic and ties them together)
+
++gui:
+    *Sending
+        *displays:
+            +host list
+            +file to send (with uneditable text box and browse)
+            +send button
+        *receives:
+            +host list from controller whenever it is updated (add list to dropdown)
+            +single host that goes online (add to dropdown)
+            +single host that goes offline (remove to dropdown)
+        *sends:
+            +signal controller that send has been clicked
+            +host list selection to controller WHEN SEND CLICKED
+            +file to send to controller WHEN SEND CLICKED
+    *Receiving
+        *displays:
+            +popup with title "[Host] wants to send you:"
+            +filename
+            +accept and deny button
+            +file browser to save file
+        *receives:
+            +host up from controller
+            +file to save from controller
+        *sends:
+            +signal controller that accept or deny has been clicked
+            +location of file to be saved
+*logic
+    *Main components
+        *Server handles
+            *Receive bytes from client:
+                * (1) new client is online
+                    -update controller with ip
+                * (2) client is trying to send data
+                    -update controller with ip and filename
+                    -controller updates server whether file was accepted or denied (controller calls server method)
+                    -send client:
+                        -2: accept data
+                        -3: deny data
+                    -if 2, wait for client to send data:
+                        -save file and update controller
+                * (-1) client is offline
+                    -update controller with ip
+
+        *Client handles
+            * (1) pinging computers that it is online (socket terminates afterward)
+                *updates controller with list of online computers
+            * (2) sends signal that it is trying to send data
+                *sends file name
+                *sends ip
+                *update controller that request was sent (NOT NEEDED IDK)
+            *listens for reply:
+                *(2) send data and update controller
+                *(3) update controller and terminate socket
+            *(-1) sends signal if it is closing

@@ -1,34 +1,30 @@
+package com.arav.fileTransfer;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
 
-public class StreamTools {
+public class IOTools {
 
-    public static boolean copyStream(InputStream in, OutputStream out) {
+    public static long copyStream(InputStream in, OutputStream out) {
+        int count = 0;
         try {
             byte[] buffer = new byte[8192];
-            int count;
-            int start = 0;
+            int n;
 
-            while ((count = in.read(buffer)) != -1) {
-                if(start == 0) {
-                    start++;
-                }
-                out.write(buffer, 0, count);
+            while ((n = in.read(buffer)) != -1) {
+                out.write(buffer, 0, n);
+                count += n;
             }
-            if(start == 0) {
-                return false;
-            }
+
         } catch (IOException e) {
             System.out.println(e);
-            return false;
+            return count;
         }
 
-        return true;
+        return count;
     }
 
 
